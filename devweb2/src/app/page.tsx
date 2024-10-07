@@ -12,28 +12,67 @@ interface TaskProps {
 
 
 export default function Home() {
-  //Inicializa lista de tarefas como lista vazia
+
+  // Linkar os inputs
+  const descriptionRef = useRef<HTMLInputElement | null>(null)
+  const dateRef = useRef<HTMLInputElement | null>(null)
+
+  // Inicializa lista de tarefas da página como lista vazia
   const [tasks, setTasks] = useState<TaskProps[]>([])
 
-  //linkar os inputs
-  const descriptionRef = useRef<HTMLInputElement | null> (null)
-  const dateRef = useRef<HTMLInputElement | null> (null)
-
-  // Ao renderizar a página, chama a função "loadTasks"
+  // Ao renderizar a página, chama a função "readTasks"
   useEffect(() => {
-    loadTasks();
+    readTasks();
   }, [])
 
-  //Busca as tarefas no banco de dados via API
-  async function loadTasks() {
+  // Busca as tarefas no banco de dados via API
+  async function readTasks() {
     const response = await api.get("/tasks")
     setTasks(response.data)
   }
-  function handleSubmit(event: FormEvent){
+
+  // Cria uma nova tarefa via API
+  async function createTask(event: FormEvent) {
     event.preventDefault()
-    console.log(descriptionRef.current?.value)
-    console.log(dateRef.current?.value)
+    const response = await api.post("/tasks", {
+      description: descriptionRef.current?.value,
+      date: dateRef.current?.value
+    }) 
+    setTasks(allTasks => [...allTasks, response.data])
   }
+
+  // Deleta uma tarefa
+  async function deleteTask(id: string){
+    try{
+      await api.delete("/tasks", {
+        params: {
+          id: id,
+        }
+      })
+      const allTasks = tasks.filter((task) => task.id !== id)
+      setTasks(allTasks)
+    }
+    catch(err){
+      alert(err)
+    }
+  }
+
+  async function setTaskDone(id:string) {
+    try {
+      await api.put("/tasks", {
+        params: {
+          id: id
+        },
+        status: true,
+      })
+      const response = await api.get("/tasks")
+      setTasks(response.data)
+    }
+    catch(err){
+      alert(err)
+    }
+  }
+
 
   return (
     <div className="w-full min-h-screen bg-sky-500 flex justify-center items-center px-4 shadow-lg">
