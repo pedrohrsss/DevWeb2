@@ -44,11 +44,7 @@ export default function Home() {
   // Deleta uma tarefa
   async function deleteTask(id: string){
     try{
-      await api.delete("/tasks", {
-        params: {
-          id: id,
-        }
-      })
+      await api.delete("/tasks/" + id)
       const allTasks = tasks.filter((task) => task.id !== id)
       setTasks(allTasks)
     }
@@ -80,7 +76,7 @@ export default function Home() {
         <section>
           <h1 className="text-4xl text-sky-800 font-bold text-center mb-6">Lista de Tarefas</h1>
           
-          <form className="flex flex-col mb-6" onSubmit={handleSubmit}>
+          <form className="flex flex-col mb-6" onSubmit={createTask}>
             <label className="text-sky-800 mb-2">Descrição da Tarefa</label>
             <input
               type="text"
