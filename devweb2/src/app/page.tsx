@@ -10,7 +10,6 @@ interface TaskProps {
   status: boolean;
 }
 
-
 export default function Home() {
 
   // Linkar os inputs
@@ -28,10 +27,11 @@ export default function Home() {
   // Busca as tarefas no banco de dados via API
   async function readTasks() {
     const response = await api.get("/tasks")
+    console.log(response.data)
     setTasks(response.data)
   }
 
-  // Cria uma nova tarefa via API
+  // Cria uma nova tarefa
   async function createTask(event: FormEvent) {
     event.preventDefault()
     const response = await api.post("/tasks", {
@@ -55,10 +55,7 @@ export default function Home() {
 
   async function setTaskDone(id:string) {
     try {
-      await api.put("/tasks", {
-        params: {
-          id: id
-        },
+      await api.put("/tasks/" + id, {
         status: true,
       })
       const response = await api.get("/tasks")
@@ -68,7 +65,6 @@ export default function Home() {
       alert(err)
     }
   }
-
 
   return (
     <div className="w-full min-h-screen bg-sky-500 flex justify-center items-center px-4 shadow-lg">
